@@ -1,0 +1,19 @@
+git config --global user.name "AndyC"
+git config --global user.email "andrewpaulcox@gmail.com"
+
+
+
+mkdir AudioTranscribe
+cd AudioTranscribe
+
+git init
+
+python3 -m venv audenv
+source audenv/bin/activate
+
+
+git remote add origin https://github.com/AndyPaulCox/Audio_Transcription.git
+
+
+git add .
+git commit -m "Initial commit"
