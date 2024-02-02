@@ -17,3 +17,10 @@ git remote add origin https://github.com/AndyPaulCox/Audio_Transcription.git
 
 git add .
 git commit -m "Initial commit"
+
+
+pip install <library-name>
+pip freeze > requirements.txt
+
+
+
