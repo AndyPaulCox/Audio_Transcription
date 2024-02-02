@@ -33,7 +33,11 @@ Commit Changes: Once your changes are staged, you need to commit them to your lo
 
 Push Changes to GitHub: Finally, push your committed changes to GitHub using the following command:
 
-		git push -u origin master
+		git push -u origin main
+
+
+
+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
 
 
 
