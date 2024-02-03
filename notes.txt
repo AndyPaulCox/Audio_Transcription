@@ -27,7 +27,7 @@ Stage Changes: After configuring .gitignore, you need to stage your changes. Thi
 
 Commit Changes: Once your changes are staged, you need to commit them to your local repository. Use the following command, replacing Your commit message with a meaningful description of your changes:
 
-		git commit -m "Correct Key in file"
+		git commit -m "Addition of audio recording from input"
 
 
 

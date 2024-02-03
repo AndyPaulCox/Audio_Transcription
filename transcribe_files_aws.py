@@ -38,7 +38,7 @@ def start_transcribe_job(s3_uri, job_name, output_bucket):
     transcribe_client.start_transcription_job(
         TranscriptionJobName=job_name,
         Media={'MediaFileUri': s3_uri},
-        MediaFormat='mp3', # Change this depending on your file format
+        MediaFormat='wav', # Change this depending on your file format
         LanguageCode='en-US', # Change this depending on your language
         OutputBucketName=output_path
     )
@@ -136,7 +136,8 @@ def main():
         json_files = list_json_files(bucket_name)
         for json_file in json_files:
             print(f"Now processing json file: {json_file }")
-            process_json_files(bucket_name) 
+            process_json_files(bucket_name)
+            delete_s3_object(bucket_name, json_file)
             
         time.sleep(60)  # Check for new files every minute 
         
