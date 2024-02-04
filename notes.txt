@@ -27,8 +27,7 @@ Stage Changes: After configuring .gitignore, you need to stage your changes. Thi
 
 Commit Changes: Once your changes are staged, you need to commit them to your local repository. Use the following command, replacing Your commit message with a meaningful description of your changes:
 
-		git commit -m "Addition of LLM summarising"
-
+		git commit -m "Addition of LLM summarisation working, but within token limit of query"
 
 
 Push Changes to GitHub: Finally, push your committed changes to GitHub using the following command:

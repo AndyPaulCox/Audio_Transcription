@@ -8,10 +8,10 @@ from datetime import datetime
 
 def summarize_text(text):
     """Send text to OpenAI's ChatGPT for summarization using the updated API syntax."""
-    response = client.chat.completions.create(model="gpt-3.5-turbo",  # Updated to use a supported model, e.g., "gpt-3.5-turbo"
+    response = client.chat.completions.create(model="gpt-4",  # Updated to use a supported model, e.g., "gpt-3.5-turbo"
     messages=[
         {"role": "system", "content": "You are an expert project manager."},
-        {"role": "user", "content": f"Summarize the following text and highlight any action points:\n\n{text}"}
+        {"role": "user", "content": f"Please produce a summary ofthe following text and add a section noting any action points:\n\n{text}"}
     ])
     return response.choices[0].message.content.strip()
 
