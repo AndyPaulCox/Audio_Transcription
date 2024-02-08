@@ -1,0 +1,9 @@
+# Set your OpenAI API key here
+openai.api_key = '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'
+
+export OPENAI_API_KEY='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'
+
+
+Cleant he text file
+
+iconv -f utf-8 -t utf-8 -c tran22.txt > cleaned_tran22.txt  

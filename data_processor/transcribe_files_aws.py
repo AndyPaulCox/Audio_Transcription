@@ -3,6 +3,12 @@ import time
 import os
 import datetime
 import json
+import os
+from data_processor import *
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+#from datetime import datetime
                 
 def list_files(bucket, prefix):
     s3_client = boto3.client('s3')
@@ -18,16 +24,43 @@ def list_files(bucket, prefix):
             if obj['Size'] > 0:
                 yield obj.get('Key')
 
-def delete_unwanted_files(bucket, prefix):
+def delete_unwanted_files(bucket, prefix='', include_subdirectories=False):
     s3_client = boto3.client('s3')
     response = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
-
+    print(f"FdelUF: Response from S3: {response}")
     if 'Contents' in response:
         for obj in response['Contents']:
             file_key = obj['Key']
-            if file_key.startswith('._'):
-                s3_client.delete_object(Bucket=bucket, Key=f'{prefix}/{file_key}')
-                print(f"Deleted unwanted file: {file_key}")
+            print(f"FdelUF: File key from S3: {file_key}")
+            # Check if the file is in the top level or in a subdirectory based on slashes in the key
+            #in_top_level = '/' not in file_key[len(prefix):].lstrip('/')
+            if file_key.startswith('.'):
+                s3_client.delete_object(Bucket=bucket, Key=file_key)
+                print(f"FdelUF: Deleted unwanted file: {file_key}")
+                
+        #s3_client = boto3.client('s3')
+        # Ensure folder name ends with a '/'
+        prefix = 'Input'
+        # Continuously fetch objects and delete them until all are removed
+        while True:
+            # List objects within the specified folder
+            response = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
+        
+            # Check if there are contents to delete
+            if 'Contents' not in response:
+                print("No more files to delete.")
+                break
+
+            # Filter and delete each object that starts with '.'
+            for obj in response['Contents']:
+                file_key = obj['Key']
+                if file_key.split('/')[-1].startswith('.'):
+                    s3_client.delete_object(Bucket=bucket, Key=file_key)
+                    print(f"Deleted: {file_key}")
+
+            # Check if the response is truncated, indicating more objects to fetch
+            if not response.get('IsTruncated'):
+                break  # Exit loop if no more objects to list
 
 def start_transcribe_job(s3_uri, job_name, output_bucket):
     transcribe_client = boto3.client('transcribe')
@@ -105,14 +138,44 @@ def process_json_files(s3_bucket):
     else:
         print("No files found in the specified folder.")
     
+def summarize_text(text):
+    """Send text to OpenAI's ChatGPT for summarization using the updated API syntax."""
+    response = client.chat.completions.create(model="gpt-4",  # Updated to use a supported model, e.g., "gpt-3.5-turbo"
+    messages=[
+        {"role": "system", "content": "You are an expert project manager."},
+        {"role": "user", "content": f"Please produce a summary ofthe following text and add a section noting any action points:\n\n{text}"}
+    ])
+    print("completed Summarization")
+    return response.choices[0].message.content.strip()
+
+def timestamp_text(text):
+    """Append a timestamp to the text."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return f"{text}\n\nTimestamp: {timestamp}"
+
+def process_text_file(file_path):
+    """Process a text file to summarize and timestamp its content."""
+    with open(file_path, 'r') as file:
+        text = file.read()
+    print("Reading meeting transcription:{file_path}")
+    summarized_text = summarize_text(text)
+    timestamped_summary = timestamp_text(summarized_text)
+
+    # Save the summarized and timestamped text to a new file
+    print("Saving meeting summary:{file_path}")
+    output_file_path = file_path.replace('.txt', '_summarized.txt')
+    with open(output_file_path, 'w') as file:
+        file.write(timestamped_summary)
+    print(f"Summarized text saved to: {output_file_path}")
 
 def main():
     bucket_name = 'r-sample-69c534b4'
     input_prefix = 'Input/'
-
+    directory = '/Users/apcox/AWS_S3/'  # Update this path to your specific directory
+    
     while True:
         # Delete files starting with '._'
-        delete_unwanted_files(bucket_name, input_prefix)
+        delete_unwanted_files(bucket_name,include_subdirectories=False)
         for file_key in list_files(bucket_name, input_prefix):
             print(f"Processing file: {file_key}")
             s3_uri = f's3://{bucket_name}/{file_key}'
@@ -138,10 +201,16 @@ def main():
             print(f"Now processing json file: {json_file }")
             process_json_files(bucket_name)
             delete_s3_object(bucket_name, json_file)
+        # Now do the summary ond action points
+        
+        for filename in os.listdir(directory):
+            if filename.endswith('.txt'):
+                file_path = os.path.join(directory, filename)
+                process_text_file(file_path)
             
         time.sleep(60)  # Check for new files every minute 
         
-             
-
+    delete_unwanted_files(bucket_name,include_subdirectories=False)
+        
 if __name__ == '__main__':
     main()

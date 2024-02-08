@@ -11,6 +11,12 @@ cd AudioTranscribe
 python3 -m venv audenv
 source audenv/bin/activate
 
+# Activating the venv for Project A
+source /Users/apcox/AudioTranscribe/audenv/bin/activate
+
+# Deactivate Project A's venv
+deactivate
+
 
 pip install <library-name>
 pip freeze > requirements.txt
