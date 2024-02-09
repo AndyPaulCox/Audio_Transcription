@@ -8,6 +8,9 @@ def main():
     bucket_name = 'r-sample-69c534b4'
     input_prefix = 'Input/'
     directory = '/Users/apcox/AWS_S3/'  # Update this path to your specific directory
+    store_path = '/Users/apcox/AWS_S3/library/full_texts/'
+    write_file_path ='/Users/apcox/AWS_S3/temp'
+    chunk_size_words = 5500  #limit of LLM if larger than this the dociument will be split into chunks of this size, if less only a single chunk will be output
     
     while True:
         # Delete files starting with '._'
@@ -37,16 +40,23 @@ def main():
             print(f"Now processing json file: {json_file }")
             process_json_files(bucket_name)
             delete_s3_object(bucket_name, json_file)
-        # Now do the summary ond action points
+        #If the file to summarize is larger than capacity of LLM split into chunks
+        # Iterate over each item in the directory
+            for item in os.listdir(directory):
+                # Construct the full path of the item
+                item_path = os.path.join(directory, item)
+                # Check if the item is a file
+                if os.path.isfile(item_path):
+                    # Call your function to process each file
+                    split_text_into_chunks(item_path, directory, chunk_size_words, store_path)
         
+        # Now do the summary and action points
         for filename in os.listdir(directory):
             if filename.endswith('.txt'):
-                file_path = os.path.join(directory, filename)
-                process_text_file(file_path)
-            
+                process_text_file(directory, filename, write_file_path)
+        delete_unwanted_files(bucket_name,include_subdirectories=False)
         time.sleep(60)  # Check for new files every minute 
         
-    delete_unwanted_files(bucket_name,include_subdirectories=False)
         
 if __name__ == '__main__':
     main()

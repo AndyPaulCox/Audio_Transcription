@@ -5,12 +5,13 @@ from .json_extract import process_json_files
 from .summarizer import summarize_text
 from .summarizer import timestamp_text
 from .summarizer import process_text_file
+from .summarizer import split_text_into_chunks
 from .transcriber import list_files
 from .transcriber import start_transcribe_job
 from .transcriber import check_job_status
 
 # Package-level variable
-__all__ = ['delete_unwanted_files', 'delete_s3_object','list_json_files', 'process_json_files','summarize_text', 'timestamp_text','process_text_file', 'list_files','start_transcribe_job', 'check_job_status']
+__all__ = ['delete_unwanted_files', 'delete_s3_object','list_json_files', 'process_json_files','summarize_text', 'timestamp_text','process_text_file', 'split_text_into_chunks', 'list_files','start_transcribe_job', 'check_job_status']
 
 # Initialization code
 print("Initializing data processing package...")
