@@ -1,0 +1,23 @@
+<!-- This is assistant/templates/index.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Assistant</title>
+</head>
+<body>
+    <h1>Ask the Project Manager</h1>
+    <form method="post">
+		Your question: <textarea name="query" required rows="4" style="width: 100%;"></textarea>
+        <input type="submit" value="Ask">
+    </form>
+    {% if results %}
+        <h2>Results:</h2>
+        <ul>
+            {% for result in results %}
+                <li>{{ result }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

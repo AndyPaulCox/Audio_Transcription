@@ -20,7 +20,7 @@ def timestamp_text(text):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return f"{text}\n\nTimestamp: {timestamp}"
 
-def process_text_file(read_file_path,filename,write_file_path):
+def process_text_file(read_file_path,filename,write_file_path,summaries_store_path):
     """Process a text file to summarize and timestamp its content."""
     read_file_name = f'{read_file_path}/{filename}'
     with open(read_file_name, 'r') as file:
@@ -31,26 +31,19 @@ def process_text_file(read_file_path,filename,write_file_path):
 
     # Save the summarized and timestamped text to a new file
     print(f"Saving meeting summary:{read_file_path}temp/{filename}")
-    file_path = os.path.join(write_file_path, filename)
-    file_path = f'{read_file_path}/temp/{filename}'
-    output_file_path = file_path.replace('.txt', '_summarized.txt')
+    timestamp = datetime.now().strftime("%Y-%m-%d %H_%M_%S")
+    filename = f'Summary_{timestamp}.txt'
+    output_file_path = f'{summaries_store_path}{filename}'
     with open(output_file_path, 'w') as file:
         file.write(timestamped_summary)
     print(f"Summarized text saved to: {output_file_path}")
     
-def split_text_into_chunks(input_file_name, output_folder_path, chunk_size_words, store_path):
+def split_text_into_chunks(transcript_text, output_folder_path, chunk_size_words, store_path):
     """
     Splits the text from the input file into chunks of approximately chunk_size_words each, 
     saves the chunks into separate files within the specified output folder, 
     and moves the original document to a specified storage folder.
-
-    Args:
-    - input_file_path (str): The path to the input .txt file containing the text to be split.
-    - output_folder_path (str): The path to the output folder where chunk files will be saved.
-    - chunk_size_words (int): The approximate number of words each chunk should contain.
-    - store_path (str): The path to the storage folder where the original document will be moved.
-
-    Returns:
+     Returns:
     - A list of paths to the generated chunk files.
     """
     # Ensure the output and storage directories exist
@@ -58,8 +51,8 @@ def split_text_into_chunks(input_file_name, output_folder_path, chunk_size_words
     os.makedirs(store_path, exist_ok=True)
     
     # Read the input file
-    with open(input_file_name, 'r', encoding='utf-8') as file:
-        text = file.read()
+    # with open(input_file_name, 'r', encoding='utf-8') as file:
+    text = transcript_text
     
     # Split the text into words
     words = text.split()
@@ -85,8 +78,5 @@ def split_text_into_chunks(input_file_name, output_folder_path, chunk_size_words
         chunk_files.append(chunk_file_path)
     
     # Move the original document to the storage folder
-    original_file_name = os.path.basename(input_file_name)
-    storage_file_path = os.path.join(store_path, original_file_name)
-    shutil.move(input_file_name, storage_file_path)
     
     return chunk_files

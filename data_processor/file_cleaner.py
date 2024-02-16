@@ -1,4 +1,5 @@
 import boto3
+import os
 
 def delete_unwanted_files(bucket, prefix='', include_subdirectories=False):
     s3_client = boto3.client('s3')
@@ -44,3 +45,26 @@ def delete_s3_object(bucket, key):
     """
     s3_client = boto3.client('s3')
     s3_client.delete_object(Bucket=bucket, Key=key)
+    
+    
+def delete_temp_files(folder_path):
+    """
+    Delete temporary files with names like 'chunk1.txt', 'chunk2.txt', etc.
+    
+    Args:
+    folder_path (str): The path to the folder containing the files.
+    """
+    # List all files in the folder
+    files = os.listdir(folder_path)
+
+    # Iterate through each file in the folder
+    for file in files:
+        # Check if the file name starts with 'chunk' and ends with '.txt'
+        if file.startswith('chunk') and file.endswith('.txt'):
+            # Construct the full file path
+            file_path = os.path.join(folder_path, file)
+            # Delete the file
+            os.remove(file_path)
+            print(f"Deleted: {file_path}")
+
+

@@ -33,13 +33,9 @@ def process_json_files(s3_bucket):
                 # Generate a timestamped filename for the txt file
                 timestamp = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
                 txt_file_name = f"transcript_{timestamp}.txt"
-                
-                # Define the path to the mounted S3 bucket
-                mounted_s3_path = "/Users/apcox/"
-                output_prefix = "AWS_S3/"
 
                 # Generate the full file path where the transcript will be saved
-                full_file_path = os.path.join(mounted_s3_path, output_prefix, txt_file_name)
+                full_file_path = f"/Users/apcox/AWS_S3/library/full_texts/{txt_file_name}"
 
                 # Write the transcript to a .txt file in the mounted S3 path
                 with open(full_file_path, 'w') as txt_file:
@@ -49,4 +45,5 @@ def process_json_files(s3_bucket):
     # Handle the case where no files are found
     else:
         print("No files found in the specified folder.")
+    return transcript_text
     
